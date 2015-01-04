@@ -33,26 +33,32 @@ public class UserCollector {
                 break;
             }
             String currentUser = observableUsers.poll();
-            resultUsers.add(getUser(currentUser));
+            User currentUserEntity = getUser(currentUser);
+            if (currentUserEntity.getPlaycount() < 10000) {
+                resultUsers.add(currentUserEntity);
+            }
             observedUsers.add(currentUser);
 
             PaginatedResult<User> friends = accessUser.getFriends(currentUser, Configuration.getApiKey());
             for (User friend : friends) {
-                if (friend.getPlaycount() < 10000) {
-                    String name = friend.getName();
-                    if (!observedUsers.contains(name)) {
-                        observableUsers.add(name);
-                        collectedUsers++;
-                    }
+
+                String name = friend.getName();
+                if (!observedUsers.contains(name)) {
+                    observableUsers.add(name);
+                    collectedUsers++;
                 }
+
             }
         }
         return resultUsers;
     }
 
-    public PaginatedResult<Track> getTrackHistory(String username) {
+    public Collection<Track> getTrackHistory(String username) {
         Period period = Period.OVERALL;
-        PaginatedResult<Track> tracks = User.getRecentTracks(username, 0, 200, Configuration.getApiKey());
-        return tracks;
+        Collection<Track> topTracks = User.getTopTracks(username, Configuration.getApiKey());
+        Collection<Track> recentTracks = User.getRecentTracks(username, 0, 200, Configuration.getApiKey()).getPageResults();
+        topTracks.addAll(recentTracks);
+        return topTracks;
     }
+
 }

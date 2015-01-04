@@ -5,7 +5,7 @@ import javax.persistence.Id;
 import java.io.Serializable;
 
 /**
- * Created by Mario on 1/4/2015.
+ * Created by Mario on 1/5/2015.
  */
 public class UserTrackPK implements Serializable {
     private String userId;

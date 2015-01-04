@@ -22,7 +22,7 @@ public class DataPopularityTest {
         UserCollector collector = new UserCollector();
         List<User> users = collector.getRequiredUsers();
         for (User user : users) {
-            PaginatedResult<Track> tracks = collector.getTrackHistory(user.getName());
+            Collection<Track> tracks = collector.getTrackHistory(user.getName());
             for (Track track : tracks) {
                 tracksCount++;
                 TrackDataCollector trackData = new TrackDataCollector(track);

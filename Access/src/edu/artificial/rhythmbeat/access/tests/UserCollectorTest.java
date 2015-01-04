@@ -3,10 +3,11 @@ package edu.artificial.rhythmbeat.access.tests;
 import de.umass.lastfm.PaginatedResult;
 import de.umass.lastfm.Track;
 import de.umass.lastfm.User;
-import edu.artificial.rhythmbeat.data.Configuration;
-import edu.artificial.rhythmbeat.data.UserCollector;
+import edu.artificial.rhythmbeat.access.Configuration;
+import edu.artificial.rhythmbeat.access.UserCollector;
 import org.junit.Test;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -25,10 +26,11 @@ public class UserCollectorTest {
     @Test
     public void testUserTracks() {
         UserCollector collector = new UserCollector();
-        PaginatedResult<Track> tracks = collector.getTrackHistory("RJ");
+        Collection<Track> tracks = collector.getTrackHistory("RJ");
+        System.out.println(tracks.size());
         for (Track track : tracks) {
 
-            System.out.println(track.getName() + track.getPlaycount());
+            System.out.println(track.getName() + " " + track.getPlaycount());
 
         }
     }

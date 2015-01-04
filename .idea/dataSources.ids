@@ -348,6 +348,7 @@
       <column name="userId" sqlType="nvarchar" precision="50" scale="0" nullable="false" jdbcType="-9"/>
       <column name="trackId" sqlType="nvarchar" precision="50" scale="0" nullable="false" jdbcType="-9"/>
       <column name="playsCount" sqlType="int" precision="10" scale="0" nullable="false" jdbcType="4"/>
+      <column name="isTest" sqlType="bit" precision="1" scale="0" nullable="false" jdbcType="-7"/>
       <primary-key name="PK_UserTracks_1" columns="userId,trackId"/>
       <foreign-key name="FK_UserTracks_Tracks" columns="trackId" ref-table="Track" ref-schema="dbo" ref-catalog="RhythmBeat" ref-columns="trackId" update-rule="1" delete-rule="1" deferrability="2"/>
     </table>
