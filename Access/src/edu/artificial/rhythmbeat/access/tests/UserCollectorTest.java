@@ -14,16 +14,18 @@ import java.util.List;
  * Created by Mario on 1/3/2015.
  */
 public class UserCollectorTest {
-    //@Test
+    @Test
     public void testUserCollection() {
         UserCollector collector = new UserCollector();
         List<User> users = collector.getRequiredUsers();
         for (User user : users) {
             System.out.println(user.getName());
+            int count = collector.getTrackHistory(user.getName()).size();
+            System.out.println(count);
         }
     }
 
-    @Test
+    // @Test
     public void testUserTracks() {
         UserCollector collector = new UserCollector();
         Collection<Track> tracks = collector.getTrackHistory("RJ");
@@ -34,4 +36,5 @@ public class UserCollectorTest {
 
         }
     }
+
 }

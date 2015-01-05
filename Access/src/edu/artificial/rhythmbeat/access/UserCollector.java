@@ -3,7 +3,6 @@ package edu.artificial.rhythmbeat.access;
 import de.umass.lastfm.PaginatedResult;
 import de.umass.lastfm.Track;
 import de.umass.lastfm.User;
-import de.umass.lastfm.Period;
 
 import java.util.*;
 
@@ -13,10 +12,11 @@ import java.util.*;
 public class UserCollector {
 
     private String rootUser = "RJ";
-    private static final int DESIRED_USERS_COUNT = 1000;
+    private static final int DESIRED_USERS_COUNT = 10;
+    private static final int MAX_PLAYCOUNTS = 100000;
 
     private User getUser(String userName) {
-        User userData = User.getInfo(userName, Configuration.getApiKey());
+        User userData = User.getInfo(userName, Configuration.getLastfmApiKey());
         return userData;
     }
 
@@ -29,36 +29,46 @@ public class UserCollector {
         int collectedUsers = 0;
         Set<String> observedUsers = new HashSet<>();
         while (!observableUsers.isEmpty()) {
-            if (collectedUsers >= DESIRED_USERS_COUNT) {
-                break;
-            }
+
             String currentUser = observableUsers.poll();
             User currentUserEntity = getUser(currentUser);
-            if (currentUserEntity.getPlaycount() < 10000) {
+            if (currentUserEntity.getPlaycount() < MAX_PLAYCOUNTS) {
                 resultUsers.add(currentUserEntity);
+
             }
             observedUsers.add(currentUser);
+            if (collectedUsers < DESIRED_USERS_COUNT) {
 
-            PaginatedResult<User> friends = accessUser.getFriends(currentUser, Configuration.getApiKey());
-            for (User friend : friends) {
+                PaginatedResult<User> friends = accessUser.getFriends(currentUser, Configuration.getLastfmApiKey());
+                for (User friend : friends) {
 
-                String name = friend.getName();
-                if (!observedUsers.contains(name)) {
-                    observableUsers.add(name);
-                    collectedUsers++;
+                    String name = friend.getName();
+                    if (!observedUsers.contains(name)) {
+                        observableUsers.add(name);
+
+                        if (friend.getPlaycount() < MAX_PLAYCOUNTS) {
+                            collectedUsers++;
+                        }
+                    }
+
                 }
-
             }
         }
         return resultUsers;
     }
 
     public Collection<Track> getTrackHistory(String username) {
-        Period period = Period.OVERALL;
-        Collection<Track> topTracks = User.getTopTracks(username, Configuration.getApiKey());
-        Collection<Track> recentTracks = User.getRecentTracks(username, 0, 200, Configuration.getApiKey()).getPageResults();
-        topTracks.addAll(recentTracks);
-        return topTracks;
+        Collection<Track> topTracks = User.getTopTracks(username, Configuration.getLastfmApiKey());
+        Collection<Track> recentTracks = User.getRecentTracks(username, 0, 80, Configuration.getLastfmApiKey()).getPageResults();
+        Map<String, Track> trackHistory = new HashMap<>();
+        for (Track track : topTracks) {
+            trackHistory.put(track.getMbid(), track);
+        }
+        for (Track track : recentTracks) {
+            trackHistory.put(track.getMbid(), track);
+        }
+
+        return trackHistory.values();
     }
 
 }
