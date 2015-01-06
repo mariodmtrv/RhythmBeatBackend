@@ -1,4 +1,4 @@
-/**
+package edu.artificial.rhythmbeat.recommend; /**
  * Created by Mario on 1/4/2015.
  */
 
@@ -49,23 +49,18 @@ public class MultipleLinearRegression {
         return beta.get(j, 0);
     }
 
+    public double[] getBeta() {
+        double[] betaVector = new double[N];
+        for (int index = 0; index < N; index++) {
+            betaVector[index] = beta.get(index, 0);
+        }
+        return betaVector;
+    }
+
     public double R2() {
         return 1.0 - SSE / SST;
     }
 
-    public static void main(String[] args) {
-        double[][] x = {{1, 10, 20},
-                {1, 20, 40},
-                {1, 40, 15},
-                {1, 80, 100},
-                {1, 160, 23},
-                {1, 200, 18}};
-        double[] y = {243, 483, 508, 1503, 1764, 2129};
-        MultipleLinearRegression regression = new MultipleLinearRegression(x, y);
-
-        System.out.printf("%.2f + %.2f beta1 + %.2f beta2  (R^2 = %.2f)\n",
-                regression.beta(0), regression.beta(1), regression.beta(2), regression.R2());
-    }
 }
 
 

@@ -12,8 +12,10 @@ import java.util.*;
 public class UserCollector {
 
     private String rootUser = "RJ";
-    private static final int DESIRED_USERS_COUNT = 10;
-    private static final int MAX_PLAYCOUNTS = 100000;
+    private static final int DESIRED_USERS_COUNT = 5;
+    private static final int MAX_OVERALL_PLAYCOUNT = 2000;
+    private static final int MIN_OVERALL_PLAYCOUNT = 200;
+    private static final int MIN_TRACK_PLAYCOUNT = 2;
 
     private User getUser(String userName) {
         User userData = User.getInfo(userName, Configuration.getLastfmApiKey());
@@ -27,17 +29,22 @@ public class UserCollector {
         User initial = getUser(rootUser);
         observableUsers.add(rootUser);
         int collectedUsers = 0;
+        int collectableUsers = 0;
         Set<String> observedUsers = new HashSet<>();
         while (!observableUsers.isEmpty()) {
 
             String currentUser = observableUsers.poll();
             User currentUserEntity = getUser(currentUser);
-            if (currentUserEntity.getPlaycount() < MAX_PLAYCOUNTS) {
+            int currentUserPlayCount = currentUserEntity.getPlaycount();
+            if ((MIN_OVERALL_PLAYCOUNT < currentUserPlayCount) && (currentUserPlayCount < MAX_OVERALL_PLAYCOUNT)) {
                 resultUsers.add(currentUserEntity);
-
+                collectedUsers++;
+            }
+            if (collectedUsers >= DESIRED_USERS_COUNT) {
+                break;
             }
             observedUsers.add(currentUser);
-            if (collectedUsers < DESIRED_USERS_COUNT) {
+            if (collectableUsers < DESIRED_USERS_COUNT) {
 
                 PaginatedResult<User> friends = accessUser.getFriends(currentUser, Configuration.getLastfmApiKey());
                 for (User friend : friends) {
@@ -46,8 +53,8 @@ public class UserCollector {
                     if (!observedUsers.contains(name)) {
                         observableUsers.add(name);
 
-                        if (friend.getPlaycount() < MAX_PLAYCOUNTS) {
-                            collectedUsers++;
+                        if ((MIN_OVERALL_PLAYCOUNT < currentUserPlayCount) && (currentUserPlayCount < MAX_OVERALL_PLAYCOUNT)) {
+                            collectableUsers++;
                         }
                     }
 
@@ -59,13 +66,28 @@ public class UserCollector {
 
     public Collection<Track> getTrackHistory(String username) {
         Collection<Track> topTracks = User.getTopTracks(username, Configuration.getLastfmApiKey());
-        Collection<Track> recentTracks = User.getRecentTracks(username, 0, 80, Configuration.getLastfmApiKey()).getPageResults();
         Map<String, Track> trackHistory = new HashMap<>();
         for (Track track : topTracks) {
-            trackHistory.put(track.getMbid(), track);
+            Track topTrack = Track.getInfo(track.getArtist(), track.getMbid(), null, username, Configuration.getLastfmApiKey());
+            trackHistory.put(track.getMbid(), topTrack);
         }
-        for (Track track : recentTracks) {
-            trackHistory.put(track.getMbid(), track);
+        Collection<Track> recentTracks = null;
+        for (int pageIndex = 0; pageIndex <= 10; pageIndex++) {
+            recentTracks = User.getRecentTracks(username, pageIndex, 100, Configuration.getLastfmApiKey()).getPageResults();
+
+            for (Track track : recentTracks) {
+                if (trackHistory.containsKey(track.getMbid())) {
+                    continue;
+                } else {
+
+                    Track recentTrack = Track.getInfo(track.getArtist(), track.getMbid(), null, username, Configuration.getLastfmApiKey());
+                    if (recentTrack != null) {
+                        if (recentTrack.getUserPlaycount() >= MIN_TRACK_PLAYCOUNT) {
+                            trackHistory.put(track.getMbid(), recentTrack);
+                        }
+                    }
+                }
+            }
         }
 
         return trackHistory.values();

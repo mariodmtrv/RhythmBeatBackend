@@ -21,7 +21,7 @@ public class UserCollectorTest {
         for (User user : users) {
             System.out.println(user.getName());
             int count = collector.getTrackHistory(user.getName()).size();
-            System.out.println(count);
+            System.out.println("COUNT////" + count);
         }
     }
 

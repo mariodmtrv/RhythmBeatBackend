@@ -3,7 +3,7 @@ package edu.artificial.rhythmbeat.dal;
 import javax.persistence.*;
 
 /**
- * Created by Mario on 1/5/2015.
+ * Created by Mario on 1/6/2015.
  */
 @Entity
 @IdClass(UserTrackPK.class)
@@ -11,7 +11,6 @@ public class UserTrack {
     private String userId;
     private String trackId;
     private int playsCount;
-    private boolean isTest;
 
     @Id
     @Column(name = "userId")
@@ -43,16 +42,6 @@ public class UserTrack {
         this.playsCount = playsCount;
     }
 
-    @Basic
-    @Column(name = "isTest")
-    public boolean isTest() {
-        return isTest;
-    }
-
-    public void setTest(boolean isTest) {
-        this.isTest = isTest;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -60,7 +49,6 @@ public class UserTrack {
 
         UserTrack userTrack = (UserTrack) o;
 
-        if (isTest != userTrack.isTest) return false;
         if (playsCount != userTrack.playsCount) return false;
         if (trackId != null ? !trackId.equals(userTrack.trackId) : userTrack.trackId != null) return false;
         if (userId != null ? !userId.equals(userTrack.userId) : userTrack.userId != null) return false;
@@ -73,7 +61,6 @@ public class UserTrack {
         int result = userId != null ? userId.hashCode() : 0;
         result = 31 * result + (trackId != null ? trackId.hashCode() : 0);
         result = 31 * result + playsCount;
-        result = 31 * result + (isTest ? 1 : 0);
         return result;
     }
 }

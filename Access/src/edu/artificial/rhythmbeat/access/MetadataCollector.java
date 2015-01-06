@@ -43,7 +43,9 @@ public class MetadataCollector {
         Song topSong = null;
         try {
             List<Song> songs = echoNest.searchSongs(songParams);
-            topSong = songs.get(0);
+            if (songs != null && songs.size() > 0) {
+                topSong = songs.get(0);
+            }
 
         } catch (EchoNestException e) {
             e.printStackTrace();
